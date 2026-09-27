@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { readNumberParam } from '@/utils/searchParams';
 
@@ -8,14 +8,14 @@ export function useListParams() {
   const search = params.get('search') ?? '';
   const [draft, setDraft] = useState(search);
 
-  const update = (next: Record<string, string | number | undefined>) => {
+  const update = useCallback((next: Record<string, string | number | undefined>) => {
     const copy = new URLSearchParams(params);
     Object.entries(next).forEach(([key, value]) => {
       if (value === undefined || value === '') copy.delete(key);
       else copy.set(key, String(value));
     });
     setParams(copy);
-  };
+  }, [params, setParams]);
 
   return useMemo(
     () => ({
@@ -31,6 +31,6 @@ export function useListParams() {
       update,
       commitSearch: () => update({ search: draft, page: 1 }),
     }),
-    [page, search, draft, params],
+    [page, search, draft, params, update],
   );
 }

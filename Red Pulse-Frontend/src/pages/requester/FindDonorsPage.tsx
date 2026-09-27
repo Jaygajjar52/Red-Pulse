@@ -52,7 +52,7 @@ export function FindDonorsPage() {
             <div>
               <div className="flex items-center justify-between">
                 <span className="rounded-lg bg-brand-100 px-3 py-1 text-xs font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-300">
-                  {m.bloodGroup.replace('_', ' ')}
+                  {(m.bloodGroup ?? '').replace('_', ' ') || '—'}
                 </span>
                 <StatusBadge status={m.verificationStatus} />
               </div>

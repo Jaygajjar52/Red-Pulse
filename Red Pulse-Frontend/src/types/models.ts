@@ -49,11 +49,21 @@ export interface DonorProfile {
   available: boolean;
   verificationStatus: VerificationStatus;
   lastDonationDate?: string;
+  dateOfBirth?: string;
+  age?: number;
+  gender?: string;
+  weight?: number;
+  latitude?: number;
+  longitude?: number;
+  isEligible?: boolean;
+  ineligibilityReason?: string;
+  cooldownDaysRemaining?: number;
 }
 
 export interface Hospital {
   id: string;
   name: string;
+  registrationNumber?: string;
   email?: string;
   phone?: string;
   address: string;
@@ -160,7 +170,7 @@ export interface DonorBadge {
   donorId: string;
   name: string;
   description: string;
-  earnedAt: string;
+  earnedAt?: string;
 }
 
 export interface DonorMilestone {
@@ -302,6 +312,67 @@ export interface RegisterRequest {
   lastName: string;
   phone?: string;
   role: Exclude<UserRole, 'ADMIN'>;
+  bloodGroup?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  weight?: number;
+  city?: string;
+  state?: string;
+  emergencyContact?: string;
+  address?: string;
+  hospitalName?: string;
+  registrationNumber?: string;
+  hospitalAddress?: string;
+  hospitalCity?: string;
+  hospitalState?: string;
+  licenseDocumentUrl?: string;
+}
+
+export interface EmergencyOtpRequest {
+  email: string;
+  phoneNumber: string;
+}
+
+export interface EmergencyOtpVerifyRequest extends EmergencyOtpRequest {
+  otp: string;
+}
+
+export interface EmergencyOtpDispatchPayload {
+  phone: string;
+  name: string;
+  email: string;
+  verificationId: string;
+  bloodGroup: BloodGroup;
+  unitsRequired: number;
+  hospitalId?: string;
+  approximateLocation?: string;
+  latitude?: number;
+  longitude?: number;
+  description?: string;
+  emergencyLevel?: Urgency;
+}
+
+export interface EmergencyOtpResponse {
+  success: boolean;
+  message: string;
+  auth: AuthResponse;
+  user: User;
+  emergency: EmergencyRequest;
+  bloodRequestId: string;
+}
+
+export interface EmergencyOtpRequestResponse {
+  success: boolean;
+  message: string;
+  expiresInSeconds: number;
+  resendAvailableInSeconds: number;
+}
+
+export interface EmergencyOtpVerifyResponse {
+  success: boolean;
+  message: string;
+  verified: boolean;
+  verificationId: string;
 }
 
 export interface ForgotPasswordRequest {
@@ -318,8 +389,12 @@ export interface CreateBloodRequestPayload {
   unitsRequired: number;
   hospitalId: string;
   requiredDate: string;
+  requiredBy?: string;
   urgency: Urgency;
   description?: string;
+  city?: string;
+  state?: string;
+  additionalNotes?: string;
 }
 
 export interface CreateEmergencyRequestPayload {
@@ -329,6 +404,10 @@ export interface CreateEmergencyRequestPayload {
   emergencyLevel: Urgency;
   description?: string;
   approximateLocation?: string;
+  city?: string;
+  state?: string;
+  contactName?: string;
+  contactPhone?: string;
 }
 
 export interface CreateAppointmentPayload {
@@ -336,6 +415,8 @@ export interface CreateAppointmentPayload {
   hospitalId: string;
   bloodRequestId?: string;
   scheduledAt: string;
+  appointmentDate?: string;
+  appointmentTime?: string;
   notes?: string;
 }
 
@@ -344,15 +425,20 @@ export interface InventoryPayload {
   availableUnits: number;
   reservedUnits: number;
   expiryDate: string;
+  quantityUnits?: number;
 }
 
 export interface StockUpdatePayload {
   availableUnits: number;
   reservedUnits?: number;
+  units?: number;
+  action?: string;
 }
 
 export interface HospitalPayload {
   name: string;
+  hospitalName?: string;
+  registrationNumber?: string;
   email?: string;
   phone?: string;
   address: string;
@@ -376,4 +462,9 @@ export interface DonorProfilePayload {
   state: string;
   available: boolean;
   phone?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  weight?: number;
+  latitude?: number;
+  longitude?: number;
 }

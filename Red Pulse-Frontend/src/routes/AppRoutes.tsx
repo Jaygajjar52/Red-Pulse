@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RoleRoute } from './RoleRoute';
 
-// Layouts
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import {
@@ -12,7 +11,6 @@ import {
   AdminLayout,
 } from '@/components/layout/DashboardLayout';
 
-// Public & Auth Pages
 import { HomePage } from '@/pages/public/HomePage';
 import {
   AboutPage,
@@ -30,7 +28,6 @@ import {
   ResetPasswordPage,
 } from '@/pages/auth/AuthPages';
 
-// Donor Pages
 import { DonorDashboardPage } from '@/pages/donor/DonorDashboardPage';
 import { DonorProfilePage } from '@/pages/donor/DonorProfilePage';
 import { DonorRequestsPage } from '@/pages/donor/DonorRequestsPage';
@@ -40,7 +37,6 @@ import { DonorAppointmentsPage } from '@/pages/donor/DonorAppointmentsPage';
 import { DonorContributionsPage } from '@/pages/donor/DonorContributionsPage';
 import { DonorNotificationsPage } from '@/pages/donor/DonorNotificationsPage';
 
-// Requester Pages
 import { RequesterDashboardPage } from '@/pages/requester/RequesterDashboardPage';
 import { CreateBloodRequestPage } from '@/pages/requester/CreateBloodRequestPage';
 import { RequesterRequestsPage } from '@/pages/requester/RequesterRequestsPage';
@@ -50,7 +46,6 @@ import { RequesterEmergencyPage } from '@/pages/requester/RequesterEmergencyPage
 import { RequesterEmergencyDetailPage } from '@/pages/requester/RequesterEmergencyDetailPage';
 import { RequesterNotificationsPage } from '@/pages/requester/RequesterNotificationsPage';
 
-// Hospital Pages
 import { HospitalDashboardPage } from '@/pages/hospital/HospitalDashboardPage';
 import { HospitalProfilePage } from '@/pages/hospital/HospitalProfilePage';
 import { HospitalInventoryPage } from '@/pages/hospital/HospitalInventoryPage';
@@ -59,7 +54,6 @@ import { HospitalDonationsPage } from '@/pages/hospital/HospitalDonationsPage';
 import { HospitalAppointmentsPage } from '@/pages/hospital/HospitalAppointmentsPage';
 import { HospitalNotificationsPage } from '@/pages/hospital/HospitalNotificationsPage';
 
-// Admin Pages
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
 import { AdminDonorsPage } from '@/pages/admin/AdminDonorsPage';
@@ -74,7 +68,7 @@ import { AdminNotificationsPage } from '@/pages/admin/AdminNotificationsPage';
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Public Pages */}
+
       <Route element={<PublicLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -86,7 +80,6 @@ export function AppRoutes() {
         <Route path="/forbidden" element={<ForbiddenPage />} />
       </Route>
 
-      {/* Auth Pages */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -94,7 +87,6 @@ export function AppRoutes() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Route>
 
-      {/* Protected Donor Routes */}
       <Route
         element={
           <ProtectedRoute>
@@ -115,7 +107,6 @@ export function AppRoutes() {
         <Route path="/donor/notifications" element={<DonorNotificationsPage />} />
       </Route>
 
-      {/* Protected Requester Routes */}
       <Route
         element={
           <ProtectedRoute>
@@ -136,7 +127,6 @@ export function AppRoutes() {
         <Route path="/requester/notifications" element={<RequesterNotificationsPage />} />
       </Route>
 
-      {/* Protected Hospital Routes */}
       <Route
         element={
           <ProtectedRoute>
@@ -156,7 +146,6 @@ export function AppRoutes() {
         <Route path="/hospital/notifications" element={<HospitalNotificationsPage />} />
       </Route>
 
-      {/* Protected Admin Routes */}
       <Route
         element={
           <ProtectedRoute>
@@ -179,7 +168,6 @@ export function AppRoutes() {
         <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
       </Route>
 
-      {/* Fallback 404 Route */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

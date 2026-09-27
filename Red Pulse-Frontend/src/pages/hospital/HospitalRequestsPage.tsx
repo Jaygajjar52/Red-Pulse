@@ -11,13 +11,27 @@ import type { BloodRequest } from '@/types';
 
 export function HospitalRequestsPage() {
   const { user } = useAuth();
-  const hospitalId = user?.hospitalId ?? 'hospital-1';
+
+  const { data: hospital } = useQuery({
+    queryKey: ['hospital', 'me', user?.hospitalId],
+    queryFn: async () => {
+      try {
+        return await hospitalApi.getMe();
+      } catch {
+        if (user?.hospitalId) return await hospitalApi.get(user.hospitalId);
+        return null;
+      }
+    },
+  });
+
+  const hospitalId = hospital?.id ?? user?.hospitalId;
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
   const { data: requestsResponse, isLoading } = useQuery({
     queryKey: ['hospital-requests', hospitalId, page, search],
-    queryFn: () => hospitalApi.bloodRequests(hospitalId, { page, size: 10, search: search || undefined }),
+    queryFn: () => (hospitalId ? hospitalApi.bloodRequests(hospitalId, { page, size: 10, search: search || undefined }) : { content: [], totalElements: 0, page: 0, size: 10, totalPages: 0 }),
+    enabled: !!hospitalId,
   });
 
   if (isLoading) return <PageSpinner label="Loading incoming requests..." />;
@@ -32,7 +46,7 @@ export function HospitalRequestsPage() {
       key: 'bloodGroup',
       header: 'Blood Group',
       render: (r: BloodRequest) => (
-        <span className="font-bold text-brand-600">{r.bloodGroup.replace('_', ' ')}</span>
+        <span className="font-bold text-brand-600">{(r.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
       ),
     },
     {
@@ -43,7 +57,7 @@ export function HospitalRequestsPage() {
     {
       key: 'requiredDate',
       header: 'Required Date',
-      render: (r: BloodRequest) => new Date(r.requiredDate).toLocaleDateString(),
+      render: (r: BloodRequest) => r.requiredDate ? new Date(r.requiredDate).toLocaleDateString() : '—',
     },
     {
       key: 'urgency',

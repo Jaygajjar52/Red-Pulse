@@ -93,6 +93,9 @@ export interface EmergencyApi {
   get: (id: string) => Promise<EmergencyRequest>;
   alertDonors: (id: string) => Promise<EmergencyRequest>;
   resolve: (id: string) => Promise<EmergencyRequest>;
+  requestOtp: (payload: import('@/types').EmergencyOtpRequest) => Promise<import('@/types').EmergencyOtpRequestResponse>;
+  verifyOtp: (payload: import('@/types').EmergencyOtpVerifyRequest) => Promise<import('@/types').EmergencyOtpVerifyResponse>;
+  verifyAndDispatch: (payload: import('@/types').EmergencyOtpDispatchPayload) => Promise<import('@/types').EmergencyOtpResponse>;
 }
 
 export interface AppointmentApi {
@@ -141,6 +144,7 @@ export interface DonationApi {
 export interface HospitalApi {
   list: (params?: PageRequest) => Promise<PageResponse<Hospital>>;
   get: (id: string) => Promise<Hospital>;
+  getMe: () => Promise<Hospital>;
   create: (payload: HospitalPayload) => Promise<Hospital>;
   update: (id: string, payload: HospitalPayload) => Promise<Hospital>;
   remove: (id: string) => Promise<void>;

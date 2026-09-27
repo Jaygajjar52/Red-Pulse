@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { authApi } from '@/api';
 import { clearTokens, persistTokens, registerAuthHandlers } from '@/api/axios';
 import type { LoginRequest, RegisterRequest, User } from '@/types';
-import { normalizeApiError } from '@/api/errors';
 
 interface AuthContextValue {
   user: User | null;
@@ -106,23 +105,4 @@ export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
-}
-
-export function roleHome(role: User['role']): string {
-  switch (role) {
-    case 'DONOR':
-      return '/donor/dashboard';
-    case 'REQUESTER':
-      return '/requester/dashboard';
-    case 'HOSPITAL':
-      return '/hospital/dashboard';
-    case 'ADMIN':
-      return '/admin/dashboard';
-    default:
-      return '/';
-  }
-}
-
-export function getAuthErrorMessage(error: unknown): string {
-  return normalizeApiError(error).message;
 }

@@ -67,7 +67,7 @@ export function RequesterRequestDetailPage() {
           <div className="rounded-xl bg-stone-50 p-4 dark:bg-stone-800">
             <span className="text-xs font-semibold text-stone-500 uppercase">Blood Group</span>
             <p className="mt-1 text-2xl font-bold font-display text-brand-600">
-              {request.bloodGroup.replace('_', ' ')}
+              {(request.bloodGroup ?? '').replace('_', ' ') || '—'}
             </p>
           </div>
           <div className="rounded-xl bg-stone-50 p-4 dark:bg-stone-800">
@@ -86,11 +86,10 @@ export function RequesterRequestDetailPage() {
 
         <div className="space-y-2 text-sm text-stone-600 dark:text-stone-300">
           <p>Hospital: <strong className="text-stone-900 dark:text-white">{request.hospitalName ?? 'Target Hospital'}</strong></p>
-          <p>Required By: <strong className="text-stone-900 dark:text-white">{new Date(request.requiredDate).toLocaleDateString()}</strong></p>
+          <p>Required By: <strong className="text-stone-900 dark:text-white">{request.requiredDate ? new Date(request.requiredDate).toLocaleDateString() : '—'}</strong></p>
           {request.description && <p className="mt-2 text-xs text-stone-500 bg-stone-50 p-3 rounded-lg dark:bg-stone-800">{request.description}</p>}
         </div>
 
-        {/* Action Controls */}
         {request.status !== 'FULFILLED' && request.status !== 'CANCELLED' && (
           <div className="pt-4 border-t border-stone-100 flex flex-wrap gap-3 dark:border-stone-800">
             <Button variant="secondary" onClick={() => setShowFulfillModal(true)}>
@@ -103,7 +102,6 @@ export function RequesterRequestDetailPage() {
         )}
       </div>
 
-      {/* Matched Donors Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold font-display flex items-center gap-2">
@@ -126,7 +124,7 @@ export function RequesterRequestDetailPage() {
                 <StatusBadge status={m.verificationStatus} />
               </div>
               <p className="text-xs text-stone-500">
-                Blood Group: <strong className="text-stone-900 dark:text-white">{m.bloodGroup.replace('_', ' ')}</strong> · Match Score: {m.matchScore}%
+                Blood Group: <strong className="text-stone-900 dark:text-white">{(m.bloodGroup ?? '').replace('_', ' ') || '—'}</strong> · Match Score: {m.matchScore}%
               </p>
               <p className="text-xs text-stone-500">Approx Distance: ~{m.approximateDistanceKm ?? 3} km</p>
             </div>

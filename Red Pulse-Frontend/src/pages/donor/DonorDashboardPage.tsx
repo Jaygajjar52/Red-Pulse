@@ -83,7 +83,6 @@ export function DonorDashboardPage() {
         }
       />
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Blood Group"
@@ -99,7 +98,7 @@ export function DonorDashboardPage() {
         />
         <StatCard
           label="Upcoming Appointment"
-          value={upcomingAppointment ? new Date(upcomingAppointment.scheduledAt).toLocaleDateString() : 'None'}
+          value={upcomingAppointment?.scheduledAt ? new Date(upcomingAppointment.scheduledAt).toLocaleDateString() : 'None'}
           icon={<Calendar className="h-5 w-5 text-sky-600" />}
           hint={upcomingAppointment?.hospitalName ?? 'No pending appointment'}
         />
@@ -111,30 +110,92 @@ export function DonorDashboardPage() {
         />
       </div>
 
-      {/* Profile Banner */}
-      <div className="rounded-2xl border border-brand-100 bg-gradient-to-r from-brand-50 to-rose-50 p-6 dark:from-stone-900 dark:to-stone-950 dark:border-stone-800">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 rounded-2xl border border-brand-100 bg-gradient-to-r from-brand-50 to-rose-50 p-6 dark:from-stone-900 dark:to-stone-950 dark:border-stone-800 flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-emerald-600" />
-              <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-                Verification Status: {profile?.verificationStatus ?? 'UNVERIFIED'}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                  Clinical Eligibility Status: {profile?.isEligible !== false ? 'QUALIFIED TO DONATE' : 'COOLDOWN ACTIVE'}
+                </span>
+              </div>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                profile?.isEligible !== false ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200'
+              }`}>
+                {profile?.isEligible !== false ? 'Eligible Today' : `${profile?.cooldownDaysRemaining ?? 0} Days Left`}
               </span>
             </div>
-            <h3 className="mt-2 text-xl font-bold font-display text-stone-900 dark:text-white">
-              {profile?.available ? 'Ready to accept emergency blood requests' : 'Currently offline for donations'}
+
+            <h3 className="mt-3 text-2xl font-bold font-display text-stone-900 dark:text-white">
+              {profile?.available ? 'You are Available & Active for Emergency Dispatches' : 'You are Currently Offline'}
             </h3>
             <p className="text-sm text-stone-600 dark:text-stone-300 mt-1">
-              Location: {profile?.city ?? 'Not set'}, {profile?.state ?? 'Not set'}
+              Registered Biometrics: Weight: <strong>{profile?.weight ?? 65} kg</strong> (Min 45kg) · Age: <strong>{profile?.age ?? 25} yrs</strong> (Min 18) · Cooldown: <strong>56 Days</strong> between donations.
             </p>
+
+            {profile?.ineligibilityReason && (
+              <div className="mt-3 p-3 rounded-xl bg-amber-100/70 border border-amber-300 text-xs text-amber-900 dark:bg-amber-950/40 dark:border-amber-800 dark:text-amber-200 font-medium">
+                {profile.ineligibilityReason}
+              </div>
+            )}
           </div>
-          <Link to="/donor/profile">
-            <Button variant="secondary">Update Profile & Preferences</Button>
-          </Link>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-brand-100 dark:border-stone-800">
+            <Link to="/donor/requests">
+              <Button size="sm">
+                <Heart className="mr-1.5 h-4 w-4" /> Find Blood Requests
+              </Button>
+            </Link>
+            <Link to="/donor/appointments">
+              <Button size="sm" variant="secondary">
+                <Calendar className="mr-1.5 h-4 w-4" /> My Appointments
+              </Button>
+            </Link>
+            <Link to="/donor/profile">
+              <Button size="sm" variant="ghost">
+                Edit Health Profile
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-xs dark:border-stone-800 dark:bg-stone-900 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <span className="text-sm font-bold text-stone-900 dark:text-white flex items-center gap-1.5">
+                <Award className="h-4 w-4 text-amber-500" /> Donor Tier & Milestone
+              </span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-300">
+                {(stats?.completedDonations ?? 0) >= 10 ? 'PLATINUM' : (stats?.completedDonations ?? 0) >= 5 ? 'GOLD' : (stats?.completedDonations ?? 0) >= 3 ? 'SILVER' : 'BRONZE'}
+              </span>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              <p className="text-xs text-stone-500">
+                Next Milestone: {(stats?.completedDonations ?? 0) >= 10 ? 'Elite Life Saver Award' : `${3 - ((stats?.completedDonations ?? 0) % 3)} more donations to next tier!`}
+              </p>
+              <div className="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden dark:bg-stone-800">
+                <div
+                  className="bg-brand-600 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, Math.max(15, ((stats?.completedDonations ?? 0) / 10) * 100))}%` }}
+                />
+              </div>
+              <p className="text-xs text-stone-600 dark:text-stone-400">
+                Every unit of blood you donate can save up to <strong>3 lives</strong> in clinical trauma or surgery.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-4 mt-4 border-t border-stone-100 dark:border-stone-800">
+            <Link to="/donor/contributions" className="text-xs text-brand-600 font-bold hover:underline flex items-center justify-between">
+              <span>View Leaderboard & Badges</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Emergency & Pending Blood Requests */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold font-display flex items-center gap-2">
@@ -155,7 +216,7 @@ export function DonorDashboardPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <span className="inline-block rounded-lg bg-brand-100 dark:bg-brand-950 px-3 py-1 text-xs font-bold text-brand-700 dark:text-brand-300">
-                    {req.bloodGroup.replace('_', ' ')}
+                    {(req.bloodGroup ?? '').replace('_', ' ') || '—'}
                   </span>
                   <h3 className="mt-2 font-bold text-stone-900 dark:text-white">{req.hospitalName ?? 'Hospital Request'}</h3>
                   <div className="mt-1 flex items-center gap-1 text-xs text-stone-500">

@@ -13,34 +13,49 @@ import { toast } from 'sonner';
 
 export function HospitalProfilePage() {
   const { user } = useAuth();
-  const hospitalId = user?.hospitalId ?? 'hospital-1';
   const queryClient = useQueryClient();
 
   const { data: hospital, isLoading } = useQuery({
-    queryKey: ['hospital', hospitalId],
-    queryFn: () => hospitalApi.get(hospitalId),
+    queryKey: ['hospital', 'me', user?.hospitalId],
+    queryFn: async () => {
+      try {
+        return await hospitalApi.getMe();
+      } catch {
+        if (user?.hospitalId) return await hospitalApi.get(user.hospitalId);
+        return null;
+      }
+    },
   });
+
+  const hospitalId = hospital?.id ?? user?.hospitalId;
 
   const form = useForm<HospitalValues>({
     resolver: zodResolver(hospitalSchema),
     values: {
       name: hospital?.name ?? '',
-      email: hospital?.email ?? '',
-      phone: hospital?.phone ?? '',
+      registrationNumber: hospital?.registrationNumber ?? 'REG-HP-' + (user?.id ? user.id.slice(-6) : '001'),
+      email: hospital?.email ?? user?.email ?? '',
+      phone: hospital?.phone ?? user?.phone ?? '',
       address: hospital?.address ?? '',
-      city: hospital?.city ?? '',
-      state: hospital?.state ?? '',
+      city: hospital?.city ?? user?.city ?? '',
+      state: hospital?.state ?? user?.state ?? '',
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: (values: HospitalValues) => hospitalApi.update(hospitalId, values),
+  const saveMutation = useMutation({
+    mutationFn: (values: HospitalValues) => {
+      if (hospitalId) {
+        return hospitalApi.update(hospitalId, values);
+      }
+      return hospitalApi.create(values);
+    },
     onSuccess: () => {
-      toast.success('Hospital profile details updated!');
-      queryClient.invalidateQueries({ queryKey: ['hospital', hospitalId] });
+      toast.success(hospitalId ? 'Hospital profile details updated!' : 'Hospital profile created successfully!');
+      queryClient.invalidateQueries({ queryKey: ['hospital'] });
+      queryClient.invalidateQueries({ queryKey: ['hospitals'] });
     },
     onError: (err: unknown) => {
-      toast.error((err as Error).message || 'Failed to update hospital details');
+      toast.error((err as Error).message || 'Failed to save hospital details');
     },
   });
 
@@ -50,7 +65,7 @@ export function HospitalProfilePage() {
     <div className="max-w-3xl space-y-6">
       <PageHeader
         title="Hospital Profile & Address"
-        description="Maintain hospital contact details, emergency phone line, and location coordinates."
+        description="Maintain hospital contact details, emergency phone line, and license coordinates."
       />
 
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-xs dark:border-stone-800 dark:bg-stone-900 space-y-6">
@@ -62,8 +77,11 @@ export function HospitalProfilePage() {
           <StatusBadge status={hospital?.status ?? 'ACTIVE'} />
         </div>
 
-        <form onSubmit={form.handleSubmit((v) => updateMutation.mutate(v))} className="space-y-4">
-          <Input label="Hospital Name" error={form.formState.errors.name?.message} {...form.register('name')} />
+        <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input label="Hospital Name" error={form.formState.errors.name?.message} {...form.register('name')} />
+            <Input label="License / Registration No." error={form.formState.errors.registrationNumber?.message} {...form.register('registrationNumber')} />
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Email Address" type="email" error={form.formState.errors.email?.message} {...form.register('email')} />
@@ -78,8 +96,8 @@ export function HospitalProfilePage() {
           </div>
 
           <div className="pt-4 flex justify-end">
-            <Button type="submit" loading={updateMutation.isPending}>
-              Update Hospital Profile
+            <Button type="submit" loading={saveMutation.isPending}>
+              {hospitalId ? 'Update Hospital Profile' : 'Save Hospital Profile'}
             </Button>
           </div>
         </form>

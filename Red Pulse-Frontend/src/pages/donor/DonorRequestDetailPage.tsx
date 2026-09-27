@@ -62,7 +62,7 @@ export function DonorRequestDetailPage() {
             <div className="mt-1 flex items-center gap-2">
               <Heart className="h-6 w-6 text-brand-600" />
               <span className="text-2xl font-bold font-display text-stone-900 dark:text-white">
-                {request.bloodGroup.replace('_', ' ')}
+                {(request.bloodGroup ?? '').replace('_', ' ') || '—'}
               </span>
             </div>
           </div>
@@ -90,7 +90,7 @@ export function DonorRequestDetailPage() {
           <h3 className="font-bold text-stone-900 dark:text-white">Required Date</h3>
           <div className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
             <Calendar className="h-4 w-4 text-stone-400" />
-            <span>{new Date(request.requiredDate).toLocaleDateString()}</span>
+            <span>{request.requiredDate ? new Date(request.requiredDate).toLocaleDateString() : '—'}</span>
           </div>
         </div>
 

@@ -1,0 +1,74 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+
+  application:
+    name: red-pulse-backend
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_APP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+firebase:
+  enabled: ${FIREBASE_ENABLED:false}
+  project-id: ${FIREBASE_PROJECT_ID:}
+  client-email: ${FIREBASE_CLIENT_EMAIL:}
+  private-key: ${FIREBASE_PRIVATE_KEY:}
+  private-key-id: ${FIREBASE_PRIVATE_KEY_ID:}
+  client-id: ${FIREBASE_CLIENT_ID:}
+
+app:
+  admin:
+    bootstrap-enabled: ${ADMIN_BOOTSTRAP_ENABLED:false}
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}
+    phone: ${ADMIN_PHONE:}
+  emergency-otp:
+    expiration-seconds: ${EMERGENCY_OTP_EXPIRATION_SECONDS:300}
+    max-attempts: ${EMERGENCY_OTP_MAX_ATTEMPTS:5}
+    resend-throttle-seconds: ${EMERGENCY_OTP_RESEND_THROTTLE_SECONDS:60}
+    expose-code: ${EMERGENCY_OTP_EXPOSE_CODE:false}
+    enabled: ${EMAIL_OTP_ENABLED:false}
+    max-requests-per-email: ${EMAIL_OTP_MAX_REQUESTS_PER_EMAIL:5}
+    max-requests-per-ip: ${EMAIL_OTP_MAX_REQUESTS_PER_IP:20}
+    verification-expiration-seconds: ${EMERGENCY_VERIFICATION_EXPIRATION_SECONDS:600}
+  notifications:
+    dev-enabled: ${APP_NOTIFICATIONS_DEV_ENABLED:false}
+    sms-provider: ${APP_SMS_PROVIDER:production}
+    email-provider: ${APP_EMAIL_PROVIDER:production}
+  appointment-reminders:
+    cron: ${APPOINTMENT_REMINDER_CRON:0 0 * * * *}
+  otp-store:
+    provider: ${APP_OTP_STORE_PROVIDER:shared}

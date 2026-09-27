@@ -18,27 +18,45 @@ export function registerAuthHandlers(handlers: {
   unauthorizedHandler = handlers.onUnauthorized;
 }
 
+const memoryStore = new Map<string, string>();
+
 export function getStoredAccessToken(): string | null {
-  return localStorage.getItem(STORAGE_KEYS.accessToken);
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem(STORAGE_KEYS.accessToken);
+  }
+  return memoryStore.get(STORAGE_KEYS.accessToken) ?? null;
 }
 
 export function getStoredRefreshToken(): string | null {
-  return localStorage.getItem(STORAGE_KEYS.refreshToken);
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem(STORAGE_KEYS.refreshToken);
+  }
+  return memoryStore.get(STORAGE_KEYS.refreshToken) ?? null;
 }
 
 export function persistTokens(accessToken: string, refreshToken?: string): void {
-  localStorage.setItem(STORAGE_KEYS.accessToken, accessToken);
-  if (refreshToken) localStorage.setItem(STORAGE_KEYS.refreshToken, refreshToken);
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(STORAGE_KEYS.accessToken, accessToken);
+    if (refreshToken) localStorage.setItem(STORAGE_KEYS.refreshToken, refreshToken);
+  } else {
+    memoryStore.set(STORAGE_KEYS.accessToken, accessToken);
+    if (refreshToken) memoryStore.set(STORAGE_KEYS.refreshToken, refreshToken);
+  }
 }
 
 export function clearTokens(): void {
-  localStorage.removeItem(STORAGE_KEYS.accessToken);
-  localStorage.removeItem(STORAGE_KEYS.refreshToken);
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEYS.accessToken);
+    localStorage.removeItem(STORAGE_KEYS.refreshToken);
+  } else {
+    memoryStore.clear();
+  }
 }
 
 export const http = axios.create({
   baseURL: env.apiBaseUrl,
   headers: { 'Content-Type': 'application/json' },
+  adapter: ['http', 'xhr'],
 });
 
 http.interceptors.request.use((config) => {

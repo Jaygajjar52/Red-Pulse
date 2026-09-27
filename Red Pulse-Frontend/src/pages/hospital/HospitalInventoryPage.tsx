@@ -8,15 +8,28 @@ import { DataTable, type Column } from '@/components/tables/DataTable';
 import { PageSpinner } from '@/components/loading/PageSpinner';
 import { InventoryModal } from '@/components/modals/InventoryModal';
 import { useAuth } from '@/context/AuthContext';
-import { inventoryApi } from '@/api';
+import { inventoryApi, hospitalApi } from '@/api';
 import { toast } from 'sonner';
 import type { BloodInventory } from '@/types';
 import type { InventoryValues } from '@/schemas';
 
 export function HospitalInventoryPage() {
   const { user } = useAuth();
-  const hospitalId = user?.hospitalId ?? 'hospital-1';
   const queryClient = useQueryClient();
+
+  const { data: hospital } = useQuery({
+    queryKey: ['hospital', 'me', user?.hospitalId],
+    queryFn: async () => {
+      try {
+        return await hospitalApi.getMe();
+      } catch {
+        if (user?.hospitalId) return await hospitalApi.get(user.hospitalId);
+        return null;
+      }
+    },
+  });
+
+  const hospitalId = hospital?.id ?? user?.hospitalId;
 
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
@@ -24,11 +37,15 @@ export function HospitalInventoryPage() {
 
   const { data: inventoryResponse, isLoading } = useQuery({
     queryKey: ['hospital-inventory', hospitalId, page],
-    queryFn: () => inventoryApi.list(hospitalId, { page, size: 10 }),
+    queryFn: () => (hospitalId ? inventoryApi.list(hospitalId, { page, size: 10 }) : { content: [], totalElements: 0, page: 0, size: 10, totalPages: 0 }),
+    enabled: !!hospitalId,
   });
 
   const createMutation = useMutation({
-    mutationFn: (values: InventoryValues) => inventoryApi.create(hospitalId, values),
+    mutationFn: (values: InventoryValues) => {
+      if (!hospitalId) throw new Error('Hospital profile must be configured first');
+      return inventoryApi.create(hospitalId, values);
+    },
     onSuccess: () => {
       toast.success('Inventory stock item added!');
       queryClient.invalidateQueries({ queryKey: ['hospital-inventory', hospitalId] });
@@ -39,8 +56,10 @@ export function HospitalInventoryPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, values }: { id: string; values: InventoryValues }) =>
-      inventoryApi.update(hospitalId, id, values),
+    mutationFn: ({ id, values }: { id: string; values: InventoryValues }) => {
+      if (!hospitalId) throw new Error('Hospital profile must be configured first');
+      return inventoryApi.update(hospitalId, id, values);
+    },
     onSuccess: () => {
       toast.success('Inventory stock updated!');
       queryClient.invalidateQueries({ queryKey: ['hospital-inventory', hospitalId] });
@@ -59,7 +78,7 @@ export function HospitalInventoryPage() {
       render: (row: BloodInventory) => (
         <div className="flex items-center gap-2">
           <span className="rounded-lg bg-brand-100 px-3 py-1 text-sm font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-300">
-            {row.bloodGroup.replace('_', ' ')}
+            {(row.bloodGroup ?? '').replace('_', ' ') || '—'}
           </span>
         </div>
       ),
@@ -82,8 +101,8 @@ export function HospitalInventoryPage() {
       key: 'expiryDate',
       header: 'Expiry Date',
       render: (row: BloodInventory) => (
-        <span className={new Date(row.expiryDate).getTime() - Date.now() < 5 * 24 * 60 * 60 * 1000 ? 'text-red-600 font-bold' : ''}>
-          {new Date(row.expiryDate).toLocaleDateString()}
+        <span className={row.expiryDate && (new Date(row.expiryDate).getTime() - Date.now() < 5 * 24 * 60 * 60 * 1000) ? 'text-red-600 font-bold' : ''}>
+          {row.expiryDate ? new Date(row.expiryDate).toLocaleDateString() : '—'}
         </span>
       ),
     },
@@ -127,7 +146,6 @@ export function HospitalInventoryPage() {
         }
       />
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-xs dark:border-stone-800 dark:bg-stone-900 flex items-center gap-4">
           <div className="rounded-xl bg-brand-50 p-3 text-brand-600 dark:bg-brand-950">

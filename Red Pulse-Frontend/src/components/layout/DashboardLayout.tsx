@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Logo } from './Logo';
 import { roleNav } from '@/constants/nav';
 import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from '@/context/useTheme';
 import { cn } from '@/utils/cn';
 import { MockBanner } from '@/components/common/MockBanner';
 import { useQuery } from '@tanstack/react-query';

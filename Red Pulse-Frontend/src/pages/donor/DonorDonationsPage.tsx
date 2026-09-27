@@ -27,6 +27,7 @@ export function DonorDonationsPage() {
             page,
             size: 10,
             search: search || undefined,
+            bloodGroup: bloodGroupFilter || undefined,
           })
         : null,
     enabled: !!profile,
@@ -38,7 +39,7 @@ export function DonorDonationsPage() {
     {
       key: 'donatedAt',
       header: 'Date',
-      render: (row: DonationRecord) => new Date(row.donatedAt).toLocaleDateString(),
+      render: (row: DonationRecord) => row.donatedAt ? new Date(row.donatedAt).toLocaleDateString() : '—',
     },
     {
       key: 'hospitalName',
@@ -49,7 +50,7 @@ export function DonorDonationsPage() {
       key: 'bloodGroup',
       header: 'Blood Group',
       render: (row: DonationRecord) => (
-        <span className="font-semibold">{row.bloodGroup.replace('_', ' ')}</span>
+        <span className="font-semibold">{(row.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
       ),
     },
     {

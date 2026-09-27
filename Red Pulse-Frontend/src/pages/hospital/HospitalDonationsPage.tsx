@@ -46,7 +46,7 @@ export function HospitalDonationsPage() {
       key: 'bloodGroup',
       header: 'Blood Group',
       render: (d: DonationRecord) => (
-        <span className="font-bold text-brand-600">{d.bloodGroup.replace('_', ' ')}</span>
+        <span className="font-bold text-brand-600">{(d.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
       ),
     },
     {
@@ -57,7 +57,7 @@ export function HospitalDonationsPage() {
     {
       key: 'donatedAt',
       header: 'Donated At',
-      render: (d: DonationRecord) => new Date(d.donatedAt).toLocaleDateString(),
+      render: (d: DonationRecord) => d.donatedAt ? new Date(d.donatedAt).toLocaleDateString() : '—',
     },
     {
       key: 'status',

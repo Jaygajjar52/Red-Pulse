@@ -62,7 +62,6 @@ export function DonorContributionsPage() {
         />
       </div>
 
-      {/* Badges Earned */}
       <div className="space-y-3">
         <h2 className="text-xl font-bold font-display flex items-center gap-2">
           <Award className="h-5 w-5 text-amber-500" />
@@ -80,16 +79,17 @@ export function DonorContributionsPage() {
               <div>
                 <h3 className="font-bold text-stone-900 dark:text-white">{b.name}</h3>
                 <p className="text-xs text-stone-600 dark:text-stone-300 mt-0.5">{b.description}</p>
-                <span className="mt-2 inline-block text-[10px] text-amber-700 font-semibold dark:text-amber-400">
-                  Earned {new Date(b.earnedAt).toLocaleDateString()}
-                </span>
+                {b.earnedAt && (
+                  <span className="mt-2 inline-block text-[10px] text-amber-700 font-semibold dark:text-amber-400">
+                    Earned {new Date(b.earnedAt).toLocaleDateString()}
+                  </span>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Milestones Progress */}
       <div className="space-y-3">
         <h2 className="text-xl font-bold font-display">Contribution Milestones</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -117,7 +117,6 @@ export function DonorContributionsPage() {
         </div>
       </div>
 
-      {/* Donor Leaderboard */}
       <div className="space-y-3">
         <h2 className="text-xl font-bold font-display flex items-center gap-2">
           <Trophy className="h-5 w-5 text-amber-500" />

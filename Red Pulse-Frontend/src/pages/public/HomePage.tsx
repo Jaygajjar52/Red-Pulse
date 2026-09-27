@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { ArrowRight, HeartHandshake, Hospital, ShieldCheck, Siren } from 'lucide-react';
@@ -5,8 +6,11 @@ import { BLOOD_GROUP_INFO } from '@/constants/blood';
 import { formatBloodGroup } from '@/utils/format';
 import { env } from '@/constants/env';
 import { Card, CardBody } from '@/components/cards/Card';
+import { EmergencyQuickSosModal } from '@/components/emergency/EmergencyQuickSosModal';
 
 export function HomePage() {
+  const [sosModalOpen, setSosModalOpen] = useState(false);
+
   return (
     <div>
       <section className="relative overflow-hidden">
@@ -49,15 +53,24 @@ export function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-4 py-10 sm:flex-row sm:items-center">
           <div>
             <p className="font-display text-3xl">Need blood urgently?</p>
-            <p className="mt-2 text-brand-100">Create an emergency request after you sign in as a requester.</p>
+            <p className="mt-2 text-brand-100">Trigger immediate SOS broadcast with Phone number, Name & OTP verification.</p>
           </div>
-          <Link to="/register">
-            <Button variant="secondary" size="lg" icon={<Siren className="h-4 w-4" />}>
-              Start emergency request
-            </Button>
-          </Link>
+          <Button
+            variant="secondary"
+            size="lg"
+            icon={<Siren className="h-4 w-4 text-rose-600 animate-pulse" />}
+            onClick={() => setSosModalOpen(true)}
+            className="font-bold shadow-lg"
+          >
+            Start Emergency Blood SOS (OTP)
+          </Button>
         </div>
       </section>
+
+      <EmergencyQuickSosModal
+        isOpen={sosModalOpen}
+        onClose={() => setSosModalOpen(false)}
+      />
 
       <section className="mx-auto max-w-6xl px-4 py-16" id="find-blood">
         <div className="flex items-end justify-between gap-4">

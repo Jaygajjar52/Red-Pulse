@@ -20,6 +20,22 @@ export function AdminHospitalsPage() {
 
   if (isLoading) return <PageSpinner label="Loading partner hospital list..." />;
 
+  const allHospitals = hospitalsResponse?.content ?? [];
+  const filteredHospitals = allHospitals.filter((h) => {
+    if (search) {
+      const q = search.trim().toLowerCase();
+      const matchName = (h.name ?? '').toLowerCase().includes(q);
+      const matchCity = (h.city ?? '').toLowerCase().includes(q);
+      const matchReg = (h.registrationNumber ?? '').toLowerCase().includes(q);
+      if (!matchName && !matchCity && !matchReg) return false;
+    }
+    return true;
+  });
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredHospitals.length / pageSize));
+  const paginatedRows = filteredHospitals.slice((page - 1) * pageSize, page * pageSize);
+
   const columns: Column<Hospital>[] = [
     {
       key: 'name',
@@ -29,7 +45,10 @@ export function AdminHospitalsPage() {
           <Building2 className="h-5 w-5 text-sky-600 shrink-0" />
           <div>
             <p className="font-bold text-stone-900 dark:text-white">{h.name}</p>
-            <p className="text-xs text-stone-500">{h.email ?? 'No email'}</p>
+            <p className="text-xs text-stone-500">
+              {h.registrationNumber ? `Reg: ${h.registrationNumber} · ` : ''}
+              {h.email ?? 'No email'}
+            </p>
           </div>
         </div>
       ),
@@ -66,9 +85,12 @@ export function AdminHospitalsPage() {
       <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-stone-200 dark:bg-stone-900 dark:border-stone-800">
         <div className="w-64">
           <Input
-            placeholder="Search hospital or city..."
+            placeholder="Search hospital, city, or reg no..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
       </div>
@@ -76,10 +98,10 @@ export function AdminHospitalsPage() {
       <div className="bg-white rounded-2xl border border-stone-200 shadow-xs dark:bg-stone-900 dark:border-stone-800">
         <DataTable
           columns={columns}
-          rows={hospitalsResponse?.content ?? []}
+          rows={paginatedRows}
           emptyTitle="No hospitals found."
           page={page}
-          totalPages={hospitalsResponse?.totalPages ?? 1}
+          totalPages={totalPages}
           onPageChange={(p) => setPage(p)}
         />
       </div>

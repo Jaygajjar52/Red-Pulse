@@ -30,7 +30,6 @@ export function DonorRequestsPage() {
         description="Browse active patient and hospital blood requests that match your blood type."
       />
 
-      {/* Filter Bar */}
       <div className="flex flex-wrap items-center gap-4 bg-white p-4 rounded-2xl border border-stone-200 dark:bg-stone-900 dark:border-stone-800">
         <div className="w-48">
           <Select
@@ -70,7 +69,7 @@ export function DonorRequestsPage() {
               <div>
                 <div className="flex items-center justify-between">
                   <span className="rounded-lg bg-brand-100 px-3 py-1 text-xs font-bold text-brand-800 dark:bg-brand-950 dark:text-brand-300">
-                    {req.bloodGroup.replace('_', ' ')}
+                    {(req.bloodGroup ?? '').replace('_', ' ') || '—'}
                   </span>
                   <StatusBadge status={req.urgency} />
                 </div>
@@ -79,7 +78,7 @@ export function DonorRequestsPage() {
                 </h3>
                 <p className="text-xs text-stone-500 mt-1">Requester: {req.requesterName ?? 'Patient'}</p>
                 <div className="mt-4 space-y-1 text-xs text-stone-600 dark:text-stone-400">
-                  <p>Required Date: <strong>{new Date(req.requiredDate).toLocaleDateString()}</strong></p>
+                  <p>Required Date: <strong>{req.requiredDate ? new Date(req.requiredDate).toLocaleDateString() : '—'}</strong></p>
                   <p>Units Needed: <strong>{req.unitsRequired}</strong></p>
                   {req.city && <p>Location: <strong>{req.city}, {req.state}</strong></p>}
                 </div>

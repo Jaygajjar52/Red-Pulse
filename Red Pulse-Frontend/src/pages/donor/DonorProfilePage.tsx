@@ -23,6 +23,9 @@ export function DonorProfilePage() {
     resolver: zodResolver(donorProfileSchema),
     values: {
       bloodGroup: profile?.bloodGroup ?? 'O_POSITIVE',
+      gender: profile?.gender ?? 'MALE',
+      weight: profile?.weight ?? 65,
+      dateOfBirth: profile?.dateOfBirth ?? '1998-01-01',
       city: profile?.city ?? '',
       state: profile?.state ?? '',
       available: profile?.available ?? true,
@@ -47,25 +50,68 @@ export function DonorProfilePage() {
     <div className="max-w-3xl space-y-6">
       <PageHeader
         title="Donor Profile & Preferences"
-        description="Keep your location and blood group accurate to receive matching emergency requests."
+        description="Keep your clinical details, weight, and blood group accurate to ensure safe donation readiness."
       />
 
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-xs dark:border-stone-800 dark:bg-stone-900 space-y-6">
         <div className="flex items-center justify-between border-b border-stone-100 pb-4 dark:border-stone-800">
           <div>
-            <h2 className="text-lg font-bold text-stone-900 dark:text-white">Verification & Status</h2>
-            <p className="text-xs text-stone-500">Official verification status issued by system admin</p>
+            <h2 className="text-lg font-bold text-stone-900 dark:text-white">Clinical & Verification Status</h2>
+            <p className="text-xs text-stone-500">Official verification status and donation cooldown metrics</p>
           </div>
-          <StatusBadge status={profile?.verificationStatus ?? 'UNVERIFIED'} />
+          <div className="flex items-center gap-2">
+            <StatusBadge status={profile?.verificationStatus ?? 'UNVERIFIED'} />
+            {profile?.isEligible === false && (
+              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                Cooldown Active ({profile.cooldownDaysRemaining ?? 0} days left)
+              </span>
+            )}
+          </div>
         </div>
 
+        {profile?.ineligibilityReason && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+            <strong>Donation Status Notice:</strong> {profile.ineligibilityReason}
+          </div>
+        )}
+
         <form onSubmit={form.handleSubmit((values) => updateMutation.mutate(values))} className="space-y-4">
-          <Select
-            label="Blood Group"
-            options={BLOOD_GROUPS.map((bg) => ({ value: bg.value, label: bg.label }))}
-            error={form.formState.errors.bloodGroup?.message}
-            {...form.register('bloodGroup')}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Blood Group"
+              options={BLOOD_GROUPS.map((bg) => ({ value: bg.value, label: bg.label }))}
+              error={form.formState.errors.bloodGroup?.message}
+              {...form.register('bloodGroup')}
+            />
+            <Select
+              label="Gender"
+              options={[
+                { value: 'MALE', label: 'Male' },
+                { value: 'FEMALE', label: 'Female' },
+                { value: 'OTHER', label: 'Other' },
+              ]}
+              error={form.formState.errors.gender?.message}
+              {...form.register('gender')}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Weight (kg)"
+              type="number"
+              step="0.5"
+              placeholder="e.g. 65"
+              error={form.formState.errors.weight?.message}
+              {...form.register('weight', { valueAsNumber: true })}
+            />
+            <Input
+              label="Date of Birth"
+              type="date"
+              max={new Date().toISOString().split('T')[0]}
+              error={form.formState.errors.dateOfBirth?.message}
+              {...form.register('dateOfBirth')}
+            />
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="City" error={form.formState.errors.city?.message} {...form.register('city')} />

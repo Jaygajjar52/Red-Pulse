@@ -9,15 +9,34 @@ logs/
 # Node
 **/node_modules/
 **/dist/
+**/coverage/
+**/.vite/
 
-# Java
+# Java / Maven
 **/target/
+**/.mvn/wrapper/maven-wrapper.jar
 
-# Environment / secrets
+# Environment / secrets  (NEVER commit real secrets; only .env.example is tracked)
 .env
 .env.*
 !.env.example
+!.env.*.example
+
+# Test / tooling output
+**/playwright-report/
+**/test-results/
+**/.playwright/
+**/jacoco.exec
+**/jacoco.xml
+**/site/
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo

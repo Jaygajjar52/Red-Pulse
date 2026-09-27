@@ -118,7 +118,6 @@ export function RequesterEmergencyPage() {
           </form>
         </div>
 
-        {/* Existing Emergencies List */}
         <div className="space-y-3">
           <h2 className="font-bold text-lg text-stone-900 dark:text-white">Active Emergency Alerts</h2>
           <div className="space-y-3">
@@ -128,11 +127,11 @@ export function RequesterEmergencyPage() {
                 className="rounded-2xl border border-stone-200 bg-white p-4 shadow-xs dark:border-stone-800 dark:bg-stone-900 space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-rose-600">{em.bloodGroup.replace('_', ' ')}</span>
+                  <span className="font-bold text-rose-600">{(em.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
                   <StatusBadge status={em.status} />
                 </div>
                 <p className="text-xs text-stone-600 dark:text-stone-300 font-semibold">{em.hospitalName ?? 'Hospital ER'}</p>
-                <p className="text-xs text-stone-500">Units: {em.unitsRequired} · {new Date(em.createdAt).toLocaleTimeString()}</p>
+                <p className="text-xs text-stone-500">Units: {em.unitsRequired} · {em.createdAt ? new Date(em.createdAt).toLocaleTimeString() : '—'}</p>
                 <Link to={`/requester/emergency/${em.id}`} className="block pt-2">
                   <Button size="sm" variant="secondary" className="w-full">Track Emergency</Button>
                 </Link>

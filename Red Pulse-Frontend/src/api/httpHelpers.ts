@@ -33,3 +33,25 @@ export function asBlobResponse(response: AxiosResponse<Blob>): { data: Blob; con
     contentDisposition: response.headers['content-disposition'] as string | undefined,
   };
 }
+
+export function wrapPageResponse<T>(data: unknown): { content: T[]; page: number; size: number; totalElements: number; totalPages: number } {
+  if (Array.isArray(data)) {
+    return {
+      content: data as T[],
+      page: 0,
+      size: data.length,
+      totalElements: data.length,
+      totalPages: data.length > 0 ? 1 : 0,
+    };
+  }
+  if (data && typeof data === 'object' && 'content' in data && Array.isArray((data as { content: unknown }).content)) {
+    return data as { content: T[]; page: number; size: number; totalElements: number; totalPages: number };
+  }
+  return {
+    content: [],
+    page: 0,
+    size: 0,
+    totalElements: 0,
+    totalPages: 0,
+  };
+}

@@ -55,7 +55,6 @@ export function AdminAnalyticsPage() {
         description="Comprehensive analytical reporting across donations, urgent dispatches, user demographics, and hospital inventory."
       />
 
-      {/* Date Filter Bar */}
       <div className="flex flex-wrap items-center gap-4 bg-white p-4 rounded-2xl border border-stone-200 dark:bg-stone-900 dark:border-stone-800">
         <div className="w-48">
           <Input label="From Date" type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
@@ -66,7 +65,7 @@ export function AdminAnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Area Chart: Donations */}
+
         <ChartCard title="Donation Drive Trajectory" description="Monthly trajectory of blood units collected">
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={donations?.series ?? []}>
@@ -79,7 +78,6 @@ export function AdminAnalyticsPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* Bar Chart: Requests */}
         <ChartCard title="Blood Requests Volume" description="Demand trends grouped by timeframe">
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={bloodRequests?.series ?? []}>
@@ -92,7 +90,6 @@ export function AdminAnalyticsPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* User Role Distribution Pie */}
         <ChartCard title="User Role Breakdown" description="Proportion of Donors, Requesters, Hospitals, and Admins">
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
@@ -114,7 +111,6 @@ export function AdminAnalyticsPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* Emergency Request Stats */}
         <ChartCard title="Emergency Response Status" description="Breakdown of emergency dispatches">
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={emergencyStats?.breakdown ?? []}>

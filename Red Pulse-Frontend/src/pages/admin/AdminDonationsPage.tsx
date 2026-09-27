@@ -29,6 +29,23 @@ export function AdminDonationsPage() {
 
   if (isLoading) return <PageSpinner label="Loading all donation records..." />;
 
+  const allDonations = donationsResponse?.content ?? [];
+  const filteredDonations = allDonations.filter((d) => {
+    if (statusFilter && d.status !== statusFilter) return false;
+    if (bloodGroupFilter && d.bloodGroup !== bloodGroupFilter) return false;
+    if (search) {
+      const q = search.trim().toLowerCase();
+      const matchDonor = (d.donorName ?? '').toLowerCase().includes(q);
+      const matchHospital = (d.hospitalName ?? '').toLowerCase().includes(q);
+      if (!matchDonor && !matchHospital) return false;
+    }
+    return true;
+  });
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredDonations.length / pageSize));
+  const paginatedRows = filteredDonations.slice((page - 1) * pageSize, page * pageSize);
+
   const columns: Column<DonationRecord>[] = [
     {
       key: 'donorName',
@@ -44,7 +61,7 @@ export function AdminDonationsPage() {
       key: 'bloodGroup',
       header: 'Blood Group',
       render: (d: DonationRecord) => (
-        <span className="font-bold text-brand-600">{d.bloodGroup.replace('_', ' ')}</span>
+        <span className="font-bold text-brand-600">{(d.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
       ),
     },
     {
@@ -55,7 +72,7 @@ export function AdminDonationsPage() {
     {
       key: 'donatedAt',
       header: 'Donation Date',
-      render: (d: DonationRecord) => new Date(d.donatedAt).toLocaleDateString(),
+      render: (d: DonationRecord) => d.donatedAt ? new Date(d.donatedAt).toLocaleDateString() : '—',
     },
     {
       key: 'status',
@@ -76,14 +93,20 @@ export function AdminDonationsPage() {
           <Input
             placeholder="Search donor or hospital..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
         <div className="w-48">
           <Select
             label=""
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
             options={[
               { value: '', label: 'All Statuses' },
               { value: 'SCHEDULED', label: 'Scheduled' },
@@ -96,7 +119,10 @@ export function AdminDonationsPage() {
           <Select
             label=""
             value={bloodGroupFilter}
-            onChange={(e) => setBloodGroupFilter(e.target.value)}
+            onChange={(e) => {
+              setBloodGroupFilter(e.target.value);
+              setPage(1);
+            }}
             options={[
               { value: '', label: 'All Blood Groups' },
               ...BLOOD_GROUP_OPTIONS,
@@ -108,10 +134,10 @@ export function AdminDonationsPage() {
       <div className="bg-white rounded-2xl border border-stone-200 shadow-xs dark:bg-stone-900 dark:border-stone-800">
         <DataTable
           columns={columns}
-          rows={donationsResponse?.content ?? []}
+          rows={paginatedRows}
           emptyTitle="No donation records found."
           page={page}
-          totalPages={donationsResponse?.totalPages ?? 1}
+          totalPages={totalPages}
           onPageChange={(p) => setPage(p)}
         />
       </div>

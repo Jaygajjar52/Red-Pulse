@@ -56,6 +56,23 @@ export function AdminUsersPage() {
 
   if (isLoading) return <PageSpinner label="Loading user registry..." />;
 
+  const allUsers = usersResponse?.content ?? [];
+  const filteredUsers = allUsers.filter((u) => {
+    if (statusFilter && u.status !== statusFilter) return false;
+    if (roleFilter && u.role !== roleFilter) return false;
+    if (search) {
+      const q = search.trim().toLowerCase();
+      const matchName = `${u.firstName ?? ''} ${u.lastName ?? ''}`.toLowerCase().includes(q);
+      const matchEmail = (u.email ?? '').toLowerCase().includes(q);
+      if (!matchName && !matchEmail) return false;
+    }
+    return true;
+  });
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
+  const paginatedRows = filteredUsers.slice((page - 1) * pageSize, page * pageSize);
+
   const columns: Column<User>[] = [
     {
       key: 'name',
@@ -80,7 +97,7 @@ export function AdminUsersPage() {
     {
       key: 'createdAt',
       header: 'Registered At',
-      render: (u: User) => new Date(u.createdAt).toLocaleDateString(),
+      render: (u: User) => u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—',
     },
     {
       key: 'status',
@@ -118,14 +135,20 @@ export function AdminUsersPage() {
           <Input
             placeholder="Search name or email..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
         <div className="w-48">
           <Select
             label=""
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
+            onChange={(e) => {
+              setRoleFilter(e.target.value);
+              setPage(1);
+            }}
             options={[
               { value: '', label: 'All Roles' },
               { value: 'DONOR', label: 'Donor' },
@@ -139,7 +162,10 @@ export function AdminUsersPage() {
           <Select
             label=""
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
             options={[
               { value: '', label: 'All Statuses' },
               { value: 'ACTIVE', label: 'Active' },
@@ -153,10 +179,10 @@ export function AdminUsersPage() {
       <div className="bg-white rounded-2xl border border-stone-200 shadow-xs dark:bg-stone-900 dark:border-stone-800">
         <DataTable
           columns={columns}
-          rows={usersResponse?.content ?? []}
+          rows={paginatedRows}
           emptyTitle="No users found matching query filters."
           page={page}
-          totalPages={usersResponse?.totalPages ?? 1}
+          totalPages={totalPages}
           onPageChange={(p) => setPage(p)}
         />
       </div>

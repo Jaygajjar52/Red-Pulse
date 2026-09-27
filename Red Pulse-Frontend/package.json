@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:integration": "vitest run --environment node src/__tests__/*.integration.test.ts",
     "test:watch": "vitest"
   },
   "dependencies": {

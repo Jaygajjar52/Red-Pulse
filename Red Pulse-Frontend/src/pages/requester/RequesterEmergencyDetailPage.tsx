@@ -55,7 +55,7 @@ export function RequesterEmergencyDetailPage() {
           <div className="rounded-xl bg-rose-50 p-4 dark:bg-stone-800">
             <span className="text-xs font-semibold text-rose-700 dark:text-rose-400 uppercase">Blood Group</span>
             <p className="mt-1 text-2xl font-bold font-display text-rose-700 dark:text-rose-400">
-              {emergency.bloodGroup.replace('_', ' ')}
+              {(emergency.bloodGroup ?? '').replace('_', ' ') || '—'}
             </p>
           </div>
           <div className="rounded-xl bg-stone-50 p-4 dark:bg-stone-800">
@@ -83,7 +83,6 @@ export function RequesterEmergencyDetailPage() {
           )}
         </div>
 
-        {/* Dispatch Controls */}
         <div className="pt-4 border-t border-stone-100 flex flex-wrap gap-3 dark:border-stone-800">
           {emergency.status !== 'RESOLVED' && (
             <>

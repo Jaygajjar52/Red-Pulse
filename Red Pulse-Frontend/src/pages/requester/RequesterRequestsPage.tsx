@@ -40,7 +40,7 @@ export function RequesterRequestsPage() {
       key: 'bloodGroup',
       header: 'Blood Group',
       render: (r: BloodRequest) => (
-        <span className="font-bold text-brand-600">{r.bloodGroup.replace('_', ' ')}</span>
+        <span className="font-bold text-brand-600">{(r.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
       ),
     },
     {

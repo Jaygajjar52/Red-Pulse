@@ -31,6 +31,25 @@ export function AdminRequestsPage() {
 
   if (isLoading) return <PageSpinner label="Loading all platform blood requests..." />;
 
+  const allRequests = requestsResponse?.content ?? [];
+  const filteredRequests = allRequests.filter((r) => {
+    if (statusFilter && r.status !== statusFilter) return false;
+    if (bloodGroupFilter && r.bloodGroup !== bloodGroupFilter) return false;
+    if (urgencyFilter && r.urgency !== urgencyFilter) return false;
+    if (search) {
+      const q = search.trim().toLowerCase();
+      const matchHospital = (r.hospitalName ?? '').toLowerCase().includes(q);
+      const matchCity = (r.city ?? '').toLowerCase().includes(q);
+      const matchRequester = (r.requesterName ?? '').toLowerCase().includes(q);
+      if (!matchHospital && !matchCity && !matchRequester) return false;
+    }
+    return true;
+  });
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / pageSize));
+  const paginatedRows = filteredRequests.slice((page - 1) * pageSize, page * pageSize);
+
   const columns: Column<BloodRequest>[] = [
     {
       key: 'hospitalName',
@@ -51,7 +70,7 @@ export function AdminRequestsPage() {
       key: 'bloodGroup',
       header: 'Blood Group',
       render: (r: BloodRequest) => (
-        <span className="font-bold text-brand-600">{r.bloodGroup.replace('_', ' ')}</span>
+        <span className="font-bold text-brand-600">{(r.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
       ),
     },
     {
@@ -72,7 +91,7 @@ export function AdminRequestsPage() {
     {
       key: 'createdAt',
       header: 'Created At',
-      render: (r: BloodRequest) => new Date(r.createdAt).toLocaleDateString(),
+      render: (r: BloodRequest) => r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—',
     },
   ];
 
@@ -88,14 +107,20 @@ export function AdminRequestsPage() {
           <Input
             placeholder="Search hospital or city..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
         <div className="w-40">
           <Select
             label=""
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
             options={[
               { value: '', label: 'All Statuses' },
               { value: 'PENDING', label: 'Pending' },
@@ -110,7 +135,10 @@ export function AdminRequestsPage() {
           <Select
             label=""
             value={bloodGroupFilter}
-            onChange={(e) => setBloodGroupFilter(e.target.value)}
+            onChange={(e) => {
+              setBloodGroupFilter(e.target.value);
+              setPage(1);
+            }}
             options={[
               { value: '', label: 'All Groups' },
               ...BLOOD_GROUP_OPTIONS,
@@ -121,7 +149,10 @@ export function AdminRequestsPage() {
           <Select
             label=""
             value={urgencyFilter}
-            onChange={(e) => setUrgencyFilter(e.target.value)}
+            onChange={(e) => {
+              setUrgencyFilter(e.target.value);
+              setPage(1);
+            }}
             options={[
               { value: '', label: 'All Urgencies' },
               { value: 'NORMAL', label: 'Normal' },
@@ -135,10 +166,10 @@ export function AdminRequestsPage() {
       <div className="bg-white rounded-2xl border border-stone-200 shadow-xs dark:bg-stone-900 dark:border-stone-800">
         <DataTable
           columns={columns}
-          rows={requestsResponse?.content ?? []}
+          rows={paginatedRows}
           emptyTitle="No blood requests found matching criteria."
           page={page}
-          totalPages={requestsResponse?.totalPages ?? 1}
+          totalPages={totalPages}
           onPageChange={(p) => setPage(p)}
         />
       </div>

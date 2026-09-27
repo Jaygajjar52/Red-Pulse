@@ -7,19 +7,33 @@ import { StatusBadge } from '@/components/common/Badge';
 import { DataTable, type Column } from '@/components/tables/DataTable';
 import { PageSpinner } from '@/components/loading/PageSpinner';
 import { useAuth } from '@/context/AuthContext';
-import { appointmentApi } from '@/api';
+import { appointmentApi, hospitalApi } from '@/api';
 import { toast } from 'sonner';
 import type { Appointment } from '@/types';
 
 export function HospitalAppointmentsPage() {
   const { user } = useAuth();
-  const hospitalId = user?.hospitalId ?? 'hospital-1';
   const queryClient = useQueryClient();
+
+  const { data: hospital } = useQuery({
+    queryKey: ['hospital', 'me', user?.hospitalId],
+    queryFn: async () => {
+      try {
+        return await hospitalApi.getMe();
+      } catch {
+        if (user?.hospitalId) return await hospitalApi.get(user.hospitalId);
+        return null;
+      }
+    },
+  });
+
+  const hospitalId = hospital?.id ?? user?.hospitalId;
   const [page, setPage] = useState(1);
 
   const { data: appointmentsResponse, isLoading } = useQuery({
     queryKey: ['hospital-appointments', hospitalId, page],
-    queryFn: () => appointmentApi.byHospital(hospitalId, { page, size: 10 }),
+    queryFn: () => (hospitalId ? appointmentApi.byHospital(hospitalId, { page, size: 10 }) : { content: [], totalElements: 0, page: 0, size: 10, totalPages: 0 }),
+    enabled: !!hospitalId,
   });
 
   const confirmMutation = useMutation({

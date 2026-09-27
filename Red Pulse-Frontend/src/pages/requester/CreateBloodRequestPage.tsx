@@ -34,12 +34,16 @@ export function CreateBloodRequestPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (values: BloodRequestValues) =>
-      bloodRequestApi.create({
+    mutationFn: (values: BloodRequestValues) => {
+      const selectedHospital = hospitals?.content?.find((h) => h.id === values.hospitalId);
+      return bloodRequestApi.create({
         ...values,
+        city: selectedHospital?.city || 'Ahmedabad',
+        state: selectedHospital?.state || 'Gujarat',
         bloodGroup: values.bloodGroup as BloodGroup,
         urgency: values.urgency as Urgency,
-      }),
+      });
+    },
     onSuccess: (created) => {
       toast.success('Blood request created successfully!');
       queryClient.invalidateQueries({ queryKey: ['blood-requests'] });

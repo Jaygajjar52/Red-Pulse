@@ -35,6 +35,22 @@ export function AdminDonorsPage() {
 
   if (isLoading) return <PageSpinner label="Loading donor registry..." />;
 
+  const allDonors = donorsResponse?.content ?? [];
+  const filteredDonors = allDonors.filter((d) => {
+    if (search) {
+      const q = search.trim().toLowerCase();
+      const matchName = `${d.firstName ?? ''} ${d.lastName ?? ''}`.toLowerCase().includes(q);
+      const matchCity = (d.city ?? '').toLowerCase().includes(q);
+      const matchEmail = (d.email ?? '').toLowerCase().includes(q);
+      if (!matchName && !matchCity && !matchEmail) return false;
+    }
+    return true;
+  });
+
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredDonors.length / pageSize));
+  const paginatedRows = filteredDonors.slice((page - 1) * pageSize, page * pageSize);
+
   const columns: Column<DonorProfile>[] = [
     {
       key: 'name',
@@ -50,7 +66,16 @@ export function AdminDonorsPage() {
       key: 'bloodGroup',
       header: 'Blood Group',
       render: (d: DonorProfile) => (
-        <span className="font-bold text-brand-600">{d.bloodGroup.replace('_', ' ')}</span>
+        <span className="font-bold text-brand-600">{(d.bloodGroup ?? '').replace('_', ' ') || '—'}</span>
+      ),
+    },
+    {
+      key: 'metrics',
+      header: 'Weight & Gender',
+      render: (d: DonorProfile) => (
+        <span className="text-xs text-stone-600 dark:text-stone-300">
+          {d.weight ? `${d.weight} kg` : '—'} · {d.gender ?? '—'}
+        </span>
       ),
     },
     {
@@ -100,7 +125,10 @@ export function AdminDonorsPage() {
           <Input
             placeholder="Search donor name or city..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
       </div>
@@ -108,10 +136,10 @@ export function AdminDonorsPage() {
       <div className="bg-white rounded-2xl border border-stone-200 shadow-xs dark:bg-stone-900 dark:border-stone-800">
         <DataTable
           columns={columns}
-          rows={donorsResponse?.content ?? []}
+          rows={paginatedRows}
           emptyTitle="No donor records found."
           page={page}
-          totalPages={donorsResponse?.totalPages ?? 1}
+          totalPages={totalPages}
           onPageChange={(p) => setPage(p)}
         />
       </div>

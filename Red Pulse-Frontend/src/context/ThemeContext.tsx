@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { STORAGE_KEYS } from '@/constants/storage';
 
 type Theme = 'light' | 'dark';
@@ -9,7 +9,7 @@ interface ThemeContextValue {
   setTheme: (theme: Theme) => void;
 }
 
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 function readTheme(): Theme {
   const stored = localStorage.getItem(STORAGE_KEYS.theme);
@@ -35,10 +35,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-}
-
-export function useTheme(): ThemeContextValue {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within ThemeProvider');
-  return context;
 }

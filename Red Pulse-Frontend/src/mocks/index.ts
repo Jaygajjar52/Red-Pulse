@@ -373,6 +373,61 @@ export const mockApis: ApiBundle = {
       item.status = 'RESOLVED';
       return item;
     },
+    requestOtp: async (payload) => {
+      return {
+        success: true,
+        message: `Verification OTP sent to ${payload.email}`,
+        expiresInSeconds: 300,
+        resendAvailableInSeconds: 60,
+      };
+    },
+    verifyOtp: async () => ({
+      success: true,
+      message: 'Emergency verification successful.',
+      verified: true,
+      verificationId: id('verification'),
+    }),
+    verifyAndDispatch: async (payload) => {
+      const user: User = {
+        id: id('user'),
+        email: `urgent.${payload.phone.replace(/[^0-9]/g, '')}@redpulse.dev`,
+        firstName: payload.name.split(' ')[0] || 'Emergency',
+        lastName: payload.name.split(' ')[1] || 'Requester',
+        phone: payload.phone,
+        role: 'REQUESTER',
+        status: 'ACTIVE',
+        createdAt: nowIso(),
+      };
+      const hospital = db.hospitals.find((h) => h.id === payload.hospitalId);
+      const emergency: EmergencyRequest = {
+        id: id('em'),
+        requesterId: user.id,
+        hospitalName: hospital?.name,
+        bloodGroup: payload.bloodGroup,
+        unitsRequired: payload.unitsRequired,
+        hospitalId: payload.hospitalId || '',
+        emergencyLevel: payload.emergencyLevel || 'EMERGENCY',
+        status: 'ALERT_SENT',
+        createdAt: nowIso(),
+        description: payload.description,
+        approximateLocation: payload.approximateLocation,
+      };
+      db.emergencies.unshift(emergency);
+      return {
+        success: true,
+        message: 'Emergency SOS dispatched successfully!',
+        auth: {
+          accessToken: 'mock-access-token-requester',
+          refreshToken: 'mock-refresh-token-requester',
+          tokenType: 'Bearer',
+          expiresIn: 3600,
+          user,
+        },
+        user,
+        emergency,
+        bloodRequestId: id('req'),
+      };
+    },
   },
   appointmentApi: {
     create: async (payload) => {
@@ -595,6 +650,12 @@ export const mockApis: ApiBundle = {
       const item = db.hospitals.find((h) => h.id === hospitalId);
       if (!item) mockFail(404, 'Hospital not found.');
       return item;
+    },
+    getMe: async () => {
+      requireAuth();
+      const me = db.hospitals[0];
+      if (!me) mockFail(404, 'Hospital not found.');
+      return me;
     },
     create: async (payload) => {
       requireAuth();

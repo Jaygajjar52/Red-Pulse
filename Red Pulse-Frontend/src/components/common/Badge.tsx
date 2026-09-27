@@ -38,10 +38,12 @@ export function Badge({ children, className }: { children: ReactNode; className?
   );
 }
 
-export function StatusBadge({ status }: { status: string }) {
-  const readable = labels[status] ?? status.replaceAll('_', ' ').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+export function StatusBadge({ status }: { status?: string | null }) {
+  if (!status) return null;
+  const s = String(status);
+  const readable = labels[s] ?? s.replaceAll('_', ' ').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
   return (
-    <Badge className={tones[status] ?? 'bg-stone-100 text-stone-700 border-stone-200'}>
+    <Badge className={tones[s] ?? 'bg-stone-100 text-stone-700 border-stone-200'}>
       <span className="sr-only">Status: </span>
       {readable}
     </Badge>

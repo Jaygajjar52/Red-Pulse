@@ -57,7 +57,6 @@ export function AdminDashboardPage() {
         description="Global platform telemetry, user metrics, real-time blood bank inventory, and emergency response statistics."
       />
 
-      {/* Overview Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Registered Users"
@@ -106,9 +105,8 @@ export function AdminDashboardPage() {
         />
       </div>
 
-      {/* Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Donations Over Time Line Chart */}
+
         <ChartCard title="Donations Over Time" description="Monthly completed blood donation drives">
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={donationSeries?.series ?? []}>
@@ -121,7 +119,6 @@ export function AdminDashboardPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* Requests Over Time Bar Chart */}
         <ChartCard title="Blood Requests Volume" description="Monthly blood request volume trends">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={requestSeries?.series ?? []}>
@@ -134,7 +131,6 @@ export function AdminDashboardPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* Inventory Distribution Donut Chart */}
         <ChartCard title="Inventory by Blood Group" description="Current unit distribution in partner hospitals">
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
@@ -157,7 +153,6 @@ export function AdminDashboardPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* Blood Group Demographics Bar Chart */}
         <ChartCard title="Blood Group Demographics" description="Distribution of registered donor blood groups">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={bloodGroupBreakdown?.breakdown ?? []} layout="vertical">

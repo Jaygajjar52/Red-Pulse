@@ -16,7 +16,26 @@ export const registerSchema = z.object({
   email: z.string().email('Enter a valid email'),
   phone: z.string().optional(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+
   role: z.enum(['DONOR', 'REQUESTER', 'HOSPITAL']),
+
+  bloodGroup: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  gender: z.string().optional(),
+  weight: z.number().optional(),
+
+  city: z.string().optional(),
+  state: z.string().optional(),
+  emergencyContact: z.string().optional(),
+  address: z.string().optional(),
+
+  // Hospital registration fields
+  hospitalName: z.string().optional(),
+  registrationNumber: z.string().optional(),
+  hospitalAddress: z.string().optional(),
+  hospitalCity: z.string().optional(),
+  hospitalState: z.string().optional(),
+  licenseDocumentUrl: z.string().optional(),
 });
 export type RegisterValues = z.infer<typeof registerSchema>;
 
@@ -37,6 +56,9 @@ export const donorProfileSchema = z.object({
   state: z.string().min(1, 'State is required'),
   phone: z.string().optional(),
   available: z.boolean(),
+  gender: z.string().min(1, 'Gender is required'),
+  weight: z.number().min(45, 'Weight must be at least 45 kg').max(250, 'Weight must not exceed 250 kg'),
+  dateOfBirth: z.string().min(1, 'Date of birth is required'),
 });
 export type DonorProfileValues = z.infer<typeof donorProfileSchema>;
 
@@ -73,6 +95,7 @@ export type AppointmentValues = z.infer<typeof appointmentSchema>;
 
 export const hospitalProfileSchema = z.object({
   name: z.string().min(1, 'Hospital name is required'),
+  registrationNumber: z.string().min(1, 'Registration number is required'),
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().min(1, 'Address is required'),
