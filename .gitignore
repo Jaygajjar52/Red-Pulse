@@ -16,19 +16,63 @@ logs/
 **/target/
 **/.mvn/wrapper/maven-wrapper.jar
 
-# Environment / secrets  (NEVER commit real secrets; only .env.example is tracked)
+# ---------------------------------------------------------------------------
+# Environment and secrets
+# Never commit real credentials. Only the *.example templates are tracked, and
+# those must contain placeholders only.
+# ---------------------------------------------------------------------------
 .env
 .env.*
+*.env
 !.env.example
 !.env.*.example
 
-# Test / tooling output
+# Spring config that usually carries a developer's own credentials
+**/application-local.properties
+**/application-local.yml
+**/application-local.yaml
+**/application-private.properties
+**/application-private.yml
+
+# Keys, certificates and keystores
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+*.crt
+*.cer
+*.der
+*.csr
+
+# Cloud provider and service-account credentials
+credentials.json
+**/credentials.json
+service-account*.json
+**/service-account*.json
+*-credentials.json
+**/.aws/
+**/.azure/
+**/.gcloud/
+
+# Token files
+**/token.json
+**/refresh_token.json
+**/.npmrc
+**/.netrc
+
+# ---------------------------------------------------------------------------
+# Test and tooling output
+# ---------------------------------------------------------------------------
 **/playwright-report/
 **/test-results/
 **/.playwright/
 **/jacoco.exec
 **/jacoco.xml
 **/site/
+**/coverage/**
 
 # OS
 .DS_Store
